@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Initiativen · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="initiativen">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>Initiativen</h1>
+    <p class="lede" id="lede"></p>
+    <div class="grid cols-2" id="cards"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data;
+      document.getElementById("lede").textContent =
+        D.initiatives.length + " Initiativen zum " + D.round.label + ".";
+      document.getElementById("cards").innerHTML = D.initiatives
+        .map((i) => {
+          const applicant = i.applicantId ? IK.memberName(i.applicantId) : "—";
+          const fund = i.fund ? `<span class="badge fund">${i.fund}</span>` : "";
+          return `
+            <div class="card init-card">
+              <h3>🌱 ${IK.esc(i.title)} ${fund}</h3>
+              <div class="desc">${IK.esc(i.description)}</div>
+              <div class="muted" style="font-size:.85rem">Eingereicht von ${IK.esc(applicant)}</div>
+              <div class="foot" style="margin-top:12px">
+                <span><span class="stat"><span class="value" style="font-size:1.25rem">${IK.money(i.total)}</span></span></span>
+                <span class="muted">${i.supporters.length} Unterstützer:innen</span>
+              </div>
+            </div>`;
+        })
+        .join("");
+    };
+  </script>
+</body>
+</html>

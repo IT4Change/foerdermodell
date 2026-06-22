@@ -1,0 +1,10 @@
+# Quell-PDFs enthalten (unvollständig geschwärzte) Personendaten — nie einchecken.
+*.pdf
+pdf-quellen/*.pdf
+
+# Node
+node_modules/
+
+# OS/Editor
+.DS_Store
+*.log

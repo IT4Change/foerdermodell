@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ergebnis · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="ergebnis">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>Ergebnis</h1>
+    <p class="lede" id="lede"></p>
+
+    <div class="card" id="bars"></div>
+
+    <h2>Zusammenfassung</h2>
+    <div class="grid cols-3" id="summary"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data;
+      document.getElementById("lede").textContent =
+        "Förderung je Initiative am " + D.round.label + " (Anteile + freie Spenden).";
+
+      const max = Math.max(...D.initiatives.map((i) => i.total), 1);
+      document.getElementById("bars").innerHTML = D.initiatives
+        .map((i) => {
+          const sharesW = (i.fromShares / max) * 100;
+          const donW = (i.fromDonations / max) * 100;
+          const dPart = i.fromDonations > 0 ? ` · davon Spende ${IK.money(i.fromDonations)}` : "";
+          return `
+            <div class="bar-row">
+              <span class="name">${IK.esc(i.title)}</span>
+              <span>${IK.money(i.total)}<span class="muted" style="font-weight:400">${dPart}</span></span>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:${sharesW}%;display:inline-block"></div><div class="bar-fill donation" style="width:${donW}%;display:inline-block"></div>
+              </div>
+            </div>`;
+        })
+        .join("") +
+        `<p class="muted" style="margin-top:14px">
+           <span style="display:inline-block;width:12px;height:12px;background:var(--green);border-radius:3px;vertical-align:middle"></span> aus Anteilen
+           &nbsp;&nbsp;
+           <span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:3px;vertical-align:middle"></span> freie Spenden
+         </p>`;
+
+      const s = [
+        ["Summe an Initiativen", IK.money(D.result.totalToInitiatives), "Anteile + Spenden"],
+        ["davon freie Spenden", IK.money(D.result.totalDonations), "zusätzlich zum Anteil"],
+        ["Übertrag", IK.money(D.result.carryOver), "→ nächster Stichtag"],
+      ];
+      document.getElementById("summary").innerHTML = s
+        .map(([l, v, sub]) => `<div class="card stat"><div class="label">${l}</div><div class="value">${v}</div><div class="sub">${sub}</div></div>`)
+        .join("");
+    };
+  </script>
+</body>
+</html>

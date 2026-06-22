@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mein Profil · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="profil">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1 id="name"></h1>
+    <p class="lede" id="meta"></p>
+
+    <h2>Beitragsstand</h2>
+    <div class="grid cols-3" id="beitrag"></div>
+
+    <h2>Mein Anteil am aktuellen Stichtag</h2>
+    <div class="card" id="anteil"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data, v = IK.viewer();
+      document.getElementById("name").textContent = v.name;
+      const year = (v.joinedAt || "").slice(0, 4);
+      document.getElementById("meta").textContent =
+        v.city + " · Mitglied seit " + year + (v.voteEligible ? " · stimmberechtigt" : " · noch nicht stimmberechtigt");
+
+      const balClass = v.balance < 0 ? "neg" : "pos";
+      const balLabel = v.balance < 0 ? "im Rückstand" : "im Plus";
+      const beitrag = [
+        ["Monatsbeitrag", IK.money(v.monthly), "Mindestens 15 €"],
+        ["Eingezahlt seit Januar", IK.money(v.paidSinceJan), ""],
+        ["Beitragsstand", `<span class="${balClass}">${IK.money(v.balance)}</span>`, balLabel],
+      ];
+      document.getElementById("beitrag").innerHTML = beitrag
+        .map(([l, val, sub]) => `<div class="card stat"><div class="label">${l}</div><div class="value">${val}</div><div class="sub">${sub}</div></div>`)
+        .join("");
+
+      const allocs = v.allocations.length
+        ? `<ul class="list-plain">` +
+          v.allocations
+            .map((a) => `<li><span>🌱 ${IK.esc(IK.initiativeTitle(a.initiativeId))}</span><span>${IK.money(a.amount)}</span></li>`)
+            .join("") +
+          `</ul>`
+        : `<p class="muted">Noch nichts verteilt.</p>`;
+      const donation = v.freeDonation > 0
+        ? `<p class="muted" style="margin:10px 0 0">Zusätzliche freie Spende: <strong>${IK.money(v.freeDonation)}</strong></p>`
+        : "";
+      document.getElementById("anteil").innerHTML =
+        `<div class="ballot-total" style="margin-top:0">
+           <span>Mein Anteil</span><strong>${IK.money(v.share)}</strong>
+         </div>
+         <div class="ballot-total" style="font-size:.95rem">
+           <span class="muted">davon verteilt</span><span>${IK.money(v.allocated)}</span>
+         </div>
+         <div class="ballot-total" style="font-size:.95rem">
+           <span class="muted">verbleibend (ans Konto)</span><span>${IK.money(v.remaining)}</span>
+         </div>
+         <hr style="border:none;border-top:1px solid var(--line);margin:14px 0" />
+         ${allocs}${donation}
+         <div class="btn-row" style="margin-top:16px">
+           <a class="btn ghost" href="verteilbogen.html">Verteilbogen öffnen</a>
+         </div>`;
+    };
+  </script>
+</body>
+</html>

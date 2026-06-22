@@ -1,0 +1,15 @@
+{
+  "name": "foerdermodell",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Domänenkern: Initiativkonto-Förderprozess (gleicher Anteil pro Mitglied, freie Zweckbindung).",
+  "scripts": {
+    "report": "node src/report.ts",
+    "ui:data": "node src/generate-ui-data.ts",
+    "test": "node --test 'test/*.test.ts'"
+  },
+  "engines": {
+    "node": ">=23.6"
+  }
+}

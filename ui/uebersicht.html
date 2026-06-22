@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Übersicht · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="uebersicht">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1 id="hello"></h1>
+    <p class="lede" id="round-line"></p>
+
+    <div class="grid cols-3" id="stats"></div>
+
+    <h2>Aktueller Stichtag</h2>
+    <div class="card" id="round-card"></div>
+
+    <div class="btn-row" style="margin-top:18px">
+      <a class="btn" href="verteilbogen.html">Verteilbogen öffnen</a>
+      <a class="btn ghost" href="initiativen.html">Initiativen ansehen</a>
+      <a class="btn ghost" href="ergebnis.html">Ergebnis ansehen</a>
+    </div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data, r = D.round, v = IK.viewer();
+      document.getElementById("hello").textContent = "Hallo " + v.name;
+      document.getElementById("round-line").textContent =
+        r.label + " · " + r.votedCount + " von " + r.eligibleCount + " stimmberechtigten Mitgliedern haben abgestimmt.";
+
+      const stats = [
+        ["Kontostand", IK.money(r.totalBalance), D.account.bank],
+        ["Mein Anteil", IK.money(v.share), "gleich für alle"],
+        ["Davon verteilt", IK.money(v.allocated), "Rest " + IK.money(v.remaining) + " ans Konto"],
+      ];
+      document.getElementById("stats").innerHTML = stats
+        .map(([l, val, sub]) => `<div class="card stat"><div class="label">${l}</div><div class="value">${val}</div><div class="sub">${sub}</div></div>`)
+        .join("");
+
+      const max = Math.max(...D.initiatives.map((i) => i.total), 1);
+      const rows = D.initiatives
+        .map((i) => `
+          <div class="bar-row">
+            <span class="name">${IK.esc(i.title)}</span>
+            <span>${IK.money(i.total)}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${(i.total / max) * 100}%"></div></div>
+          </div>`)
+        .join("");
+      document.getElementById("round-card").innerHTML =
+        rows +
+        `<p class="muted" style="margin:14px 0 0">Übertrag zum nächsten Stichtag: <strong>${IK.money(D.result.carryOver)}</strong></p>`;
+    };
+  </script>
+</body>
+</html>

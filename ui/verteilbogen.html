@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verteilbogen · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="verteilbogen">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>Verteilbogen</h1>
+    <p class="lede" id="lede"></p>
+
+    <div class="card">
+      <div id="rows"></div>
+      <div class="ballot-total">
+        <span>Verteilt</span>
+        <strong id="sum"></strong>
+      </div>
+      <div class="ballot-total" style="font-size:.95rem">
+        <span class="muted">Verbleibender Anteil (fällt ans Konto)</span>
+        <span class="muted" id="rest"></span>
+      </div>
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn" disabled>Verteilung abschicken</button>
+        <span class="muted" style="align-self:center">Vorschau — in der Demo ohne Funktion.</span>
+      </div>
+    </div>
+
+    <div class="card" id="donation-card" style="margin-top:16px"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data, v = IK.viewer();
+      document.getElementById("lede").textContent =
+        v.name + " · Dein Anteil am " + D.round.label + ": " + IK.money(v.share)
+        + ". Verteile ihn frei auf die Initiativen — die Summe darf den Anteil nicht übersteigen.";
+
+      const byInit = new Map(v.allocations.map((a) => [a.initiativeId, a.amount]));
+      document.getElementById("rows").innerHTML = D.initiatives
+        .map((i) => {
+          const amt = byInit.get(i.id) || 0;
+          return `
+            <div class="ballot-row">
+              <span>🌱 ${IK.esc(i.title)}</span>
+              <span class="amount-box">${IK.money(amt)}</span>
+            </div>`;
+        })
+        .join("");
+      document.getElementById("sum").textContent = IK.money(v.allocated) + " von " + IK.money(v.share);
+      document.getElementById("rest").textContent = IK.money(v.remaining);
+
+      if (v.freeDonation > 0) {
+        document.getElementById("donation-card").innerHTML =
+          `<strong>Freie zusätzliche Spende</strong>
+           <p class="muted" style="margin:6px 0 0">Zusätzlich zum Anteil hast du
+           <strong>${IK.money(v.freeDonation)}</strong> gespendet.</p>`;
+      } else {
+        document.getElementById("donation-card").remove();
+      }
+    };
+  </script>
+</body>
+</html>

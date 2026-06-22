@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projekt-Mitglieder · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="projekt-mitglieder">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>Projekt-Mitglieder</h1>
+    <p class="lede">Wer hat welche Initiative mit seinem Anteil unterstützt?</p>
+    <div class="grid cols-2" id="cards"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data;
+      document.getElementById("cards").innerHTML = D.initiatives
+        .map((i) => {
+          const fund = i.fund ? `<span class="badge fund">${i.fund}</span>` : "";
+          const list = i.supporters.length
+            ? `<ul class="list-plain">` +
+              i.supporters
+                .map((s) => `<li><span>${IK.esc(IK.memberName(s.memberId))}</span><span>${IK.money(s.amount)}</span></li>`)
+                .join("") +
+              `</ul>`
+            : `<p class="muted">Noch keine Unterstützung.</p>`;
+          const don = i.fromDonations > 0
+            ? `<p class="muted" style="margin:10px 0 0">+ freie Spenden: <strong>${IK.money(i.fromDonations)}</strong></p>`
+            : "";
+          return `
+            <div class="card">
+              <h3 style="margin:0 0 4px">🌱 ${IK.esc(i.title)} ${fund}</h3>
+              <div class="muted" style="font-size:.85rem;margin-bottom:10px">
+                ${i.supporters.length} Unterstützer:innen · gesamt ${IK.money(i.total)}
+              </div>
+              ${list}
+              ${don}
+            </div>`;
+        })
+        .join("");
+    };
+  </script>
+</body>
+</html>

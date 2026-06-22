@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Initiativkonto — UI-Muster</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="index">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>☼ Initiativkonto — UI-Muster</h1>
+    <p class="lede">
+      Statische Demo-Ansichten des Förderprozesses, alle auf demselben
+      Beispieldatensatz. Kein Login, keine echten Daten — zum Zeigen gedacht.
+    </p>
+
+    <div class="card" style="margin-bottom:20px">
+      <strong>So funktioniert das Initiativkonto</strong>
+      <p class="muted" style="margin:8px 0 0">
+        Ein Gemeinschaftskonto. Dreimal im Jahr ein <em>Stichtag</em>: Mitglieder
+        reichen Initiativen ein. Der Kontostand wird zu gleichen Teilen auf alle
+        stimmberechtigten Mitglieder aufgeteilt — jedes verteilt seinen Anteil
+        frei auf die Initiativen. Nicht vergebene Anteile bleiben auf dem Konto.
+      </p>
+    </div>
+
+    <h2>Ansichten</h2>
+    <div class="grid cols-3" id="links"></div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    const TILES = [
+      ["uebersicht.html", "Übersicht", "Kontostand, mein Anteil, aktueller Stichtag."],
+      ["initiativen.html", "Initiativen", "Die eingereichten Projekte zum Stichtag."],
+      ["verteilbogen.html", "Verteilbogen", "Den eigenen Anteil auf Initiativen verteilen."],
+      ["ergebnis.html", "Ergebnis", "Förderung je Initiative und Übertrag."],
+      ["mitglieder.html", "Mitglieder", "Die Mitglieder des Kontos."],
+      ["projekt-mitglieder.html", "Projekt-Mitglieder", "Wer welche Initiative unterstützt hat."],
+      ["profil.html", "Mein Profil", "Beitragsstand und eigene Verteilung."],
+    ];
+    window.renderPage = (IK) => {
+      document.getElementById("links").innerHTML = TILES.map(
+        ([href, title, desc]) =>
+          `<a class="card" href="${href}" style="text-decoration:none;color:inherit">
+             <strong style="color:var(--green-dark)">${title}</strong>
+             <div class="muted" style="margin-top:6px;font-size:.92rem">${desc}</div>
+           </a>`,
+      ).join("");
+    };
+  </script>
+</body>
+</html>

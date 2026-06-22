@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mitglieder · Initiativkonto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="mitglieder">
+  <div id="app-header"></div>
+  <main class="wrap">
+    <h1>Mitglieder</h1>
+    <p class="lede" id="lede"></p>
+    <div class="card" style="padding:4px 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Ort</th><th>Mitglied seit</th>
+            <th class="num">Beitrag/Monat</th><th>Stimmrecht</th><th>Abgestimmt</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.renderPage = (IK) => {
+      const D = IK.data;
+      const yes = '<span class="pos">✓</span>', no = '<span class="muted">—</span>';
+      document.getElementById("lede").textContent =
+        D.round.memberCount + " Mitglieder, davon " + D.round.eligibleCount + " stimmberechtigt.";
+      document.getElementById("rows").innerHTML = D.members
+        .map((m) => {
+          const year = (m.joinedAt || "").slice(0, 4);
+          return `<tr>
+            <td>${IK.esc(m.name)}${m.id === D.viewerId ? ' <span class="badge">ich</span>' : ""}</td>
+            <td>${IK.esc(m.city)}</td>
+            <td>${year}</td>
+            <td class="num">${IK.money(m.monthly)}</td>
+            <td>${m.voteEligible ? yes : no}</td>
+            <td>${m.allocated > 0 ? yes : no}</td>
+          </tr>`;
+        })
+        .join("");
+    };
+  </script>
+</body>
+</html>
